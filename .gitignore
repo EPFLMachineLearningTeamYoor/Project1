@@ -1,3 +1,10 @@
+# Dataset
+sample-submission.csv
+test.csv
+test.csv.zip
+train.csv
+train.csv.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
