@@ -1,5 +1,5 @@
 import numpy as np
-from helpers import *
+from scripts.helpers import *
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma, debug = False):
     losses, ws = gradient_descent(y, tx, initial_w, max_iters, gamma, debug)
