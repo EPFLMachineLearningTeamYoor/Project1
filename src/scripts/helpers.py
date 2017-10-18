@@ -1,4 +1,23 @@
 import numpy as np
+import csv
+
+def get_header(path):
+    header = None
+    with open(path, newline='') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            header = row[2:]
+            break
+    return header
+
+def impute_with_mean(X, missing_val = -999):
+    X = np.copy(X)
+    X[X == missing_val] = None
+    nan_mean = np.nanmean(X, axis = 0)
+    inds = np.where(np.isnan(X))
+    X[inds] = np.take(nan_mean, inds[1])
+    return X
+
 
 def standardize(x):
     """Standardize the original data set."""
@@ -73,22 +92,6 @@ def stochastic_gradient_descent(
                   bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
     return losses, ws
-
-def standardize(x):
-    """Standardize the original data set."""
-    mean_x = np.mean(x)
-    x = x - mean_x
-    std_x = np.std(x)
-    x = x / std_x
-    return x, mean_x, std_x
-
-def build_model_data(height, weight):
-    """Form (y,tX) to get regression data in matrix form."""
-    y = weight
-    x = height
-    num_samples = len(y)
-    tx = np.c_[np.ones(num_samples), x]
-    return y, tx
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """
