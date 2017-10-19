@@ -1,3 +1,5 @@
+# run: j=0;i=0;while (( $i < 30 )); do echo $i; python a.py $i & let j=j+1;if (( $j == 4 )); then wait; echo "joined"; j=0;fi;let i=i+1;done
+
 from sys import argv
 from scripts.plot_histograms import *
 from scripts import proj1_helpers
