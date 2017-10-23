@@ -1,6 +1,11 @@
 import numpy as np
 import csv
 
+def y_to_01(y):
+    y = np.copy(y)
+    y[y[:,0] == -1,0] = 0
+    return y
+
 def get_header(path):
     header = None
     with open(path, newline='') as f:
@@ -10,59 +15,38 @@ def get_header(path):
             break
     return header
 
-def compute_gradient(y, tx, w):
-    """Compute the gradient."""
-
-    N = y.shape[0]
-    e = y - tx @ w
-    return(- 1. / N * e.T @ tx)
-
-def gradient_descent(y, tx, initial_w, max_iters, gamma, debug = True):
+def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs = {}, debug = True):
     """Gradient descent algorithm."""
     # Define parameters to store w and loss
     ws = [initial_w]
     losses = []
     w = initial_w
     for n_iter in range(max_iters):
-        loss = compute_loss(y, tx, w)
-        gradient = compute_gradient(y, tx, w)
+        loss = loss_f(y, tx, w, **kwargs)
+        gradient = grad_f(y, tx, w, **kwargs)
         w -= gamma * gradient
         ws.append(w)
         losses.append(loss)
         if debug:
-          print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
-              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+            print("Gradient Descent(%d/%d): loss=%.2f grad_norm=%.2f w_norm=%.2f" % (n_iter, max_iters - 1, np.mean(loss), np.linalg.norm(gradient), np.linalg.norm(w)))
 
     return losses, ws
 
-def compute_loss(y, tx, w):
-    """Calculate the loss."""
-
-    N = y.shape[0]
-    e = y - tx @ w
-
-    return 1. / (2 * N) * (e.T @ e)
-
-def compute_stoch_gradient(y, tx, w):
-    """Compute a stochastic gradient from just few examples n and their corresponding y_n labels."""
-    return gd_m.compute_gradient(y, tx, w)
-
 def stochastic_gradient_descent(
-        y, tx, initial_w, batch_size, max_iters, gamma, debug = False):
+        y, tx, initial_w, batch_size, max_iters, gamma, loss_f, grad_f, kwargs = {}, debug = False):
     """Stochastic gradient descent algorithm."""
     ws = [initial_w]
     losses = []
     w = initial_w
     for (n_iter, (y_, tx_)) in enumerate(batch_iter(y, tx, batch_size = batch_size,
                                                     num_batches=max_iters, shuffle=True)):
-        loss = compute_loss(y, tx, w)
-        stoch_gradient = compute_stoch_gradient(y_, tx_, w)
+        loss = loss_f(y, tx, w, **kwargs)
+        stoch_gradient = grad_f(y_, tx_, w, **kwargs)
         w -= gamma * stoch_gradient
         ws.append(w)
         losses.append(loss)
-        if Debug:
-            print("Stochastic Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
-                  bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        if debug:
+            print("Stochastic Gradient Descent(%d/%d): loss=%.2f" % (n_iter, max_iters - 1, np.mean(loss)))
 
     return losses, ws
 
