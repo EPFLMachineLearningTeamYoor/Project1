@@ -6,12 +6,12 @@ import scripts.model_logistic as model_logistic
 def least_squares_GD(y, tx, initial_w, max_iters, gamma, debug = False):
     """ implement least squares via gradient descent """
     losses, ws = gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f = model_linear.compute_loss, grad_f = model_linear.compute_gradient, debug = debug)
-    return get_last(ws, losses)
+    return get_last_ans(ws, losses)
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma, debug = False):
     """ implement least squares via stochastic gradient descent """
     losses, ws = stochastic_gradient_descent(y, tx, initial_w, 1, max_iters, gamma, loss_f = model_linear.compute_loss, grad_f = model_linear.compute_gradient, debug = debug)
-    return get_last(ws, losses)
+    return get_last_ans(ws, losses)
 
 def least_squares(y, tx):
     """calculate the least squares solution."""
@@ -36,12 +36,12 @@ def ridge_regression(y, tx, lambda_):
 def logistic_regression(y, tx, initial_w, max_iters, gamma, debug = False):
     """ implement logistic regression via gradient descent """
     losses, ws = gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f = model_logistic.loss, grad_f = model_logistic.grad, debug = debug)
-    return get_last(ws, losses)
+    return get_last_ans(ws, losses)
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, debug = False):
     """ implement regularized logistic regression via gradient descent """
     losses, ws = gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f = model_logistic.reg_loss, grad_f = model_logistic.reg_grad, kwargs = {'lambda_': lambda_}, debug = debug)
-    return get_last(ws, losses)
+    return get_last_ans(ws, losses)
 
 
 ### TESTING SECTION
