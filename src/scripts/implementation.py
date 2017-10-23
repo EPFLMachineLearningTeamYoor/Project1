@@ -15,9 +15,6 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, debug = False):
 
 def least_squares(y, tx):
     """calculate the least squares solution."""
-    # ***************************************************
-    # returns optimal weights
-    # ***************************************************
 
     N = tx.shape[0]
     w = np.linalg.pinv(tx.T @ tx) @ tx.T @ y

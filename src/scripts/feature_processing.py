@@ -56,6 +56,8 @@ def indicator_missing(X, ids, missing_val = -999.):
         X = np.hstack((X, f_miss))
     return X
 
+### TESTING SECTION
+
 def test_binarize_1():
     x = np.array([[1,2,2,4]]).T
     x_copy = np.copy(x)
