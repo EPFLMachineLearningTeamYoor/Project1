@@ -1,6 +1,9 @@
 import numpy as np
 import csv
 
+def get_last_loss(ws, losses):
+    return (ws[-1], np.mean(losses[-1]))
+
 def y_to_01(y):
     y = np.copy(y)
     y[y[:,0] == -1,0] = 0
