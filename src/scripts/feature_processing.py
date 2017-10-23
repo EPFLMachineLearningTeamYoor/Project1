@@ -1,6 +1,7 @@
 import numpy as np
 
 def binarize_categorical_feature(f):
+    """ return binary columns for each feature value """
     values = sorted(list(set(f[:,0])))
     x = np.zeros((f.shape[0], 1))
     for v in values:
@@ -8,6 +9,7 @@ def binarize_categorical_feature(f):
     return x[:,1:]
 
 def binarize_categorical(x, ids):
+    """ replace categorical feature with multiple binary ones """
     x_ = np.zeros((x.shape[0], 1))
     for idx in ids:
         x_ = np.hstack((x_, binarize_categorical_feature(x[:, idx:idx+1])))
@@ -16,6 +18,7 @@ def binarize_categorical(x, ids):
     return x
 
 def impute_with_mean(X_, ids, missing_val = -999):
+    """ replace missing_val with mean value on columns ids """
     X_ = np.copy(X_)
     X = X_[:, ids]
     X[X == missing_val] = None
@@ -26,6 +29,7 @@ def impute_with_mean(X_, ids, missing_val = -999):
     return X_
 
 def add_polynomial(X, ids, max_degrees = 2):
+    """ add constant feature and degrees of features ids up to selected degree """
     if type(max_degrees) == type(int):
         max_degrees = np.ones((len(ids))) * max_degrees
     X_orig = X
@@ -37,6 +41,7 @@ def add_polynomial(X, ids, max_degrees = 2):
     return X
 
 def indicator_missing(X, ids, missing_val = -999.):
+    """ add binary feature indicating if original feature was missing """
     X = np.copy(X)
     for idx in ids:
         f_miss = 1. * (X[:, idx:idx + 1] == missing_val)
