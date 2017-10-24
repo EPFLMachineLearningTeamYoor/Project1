@@ -1,13 +1,16 @@
 from tqdm import tqdm
 import numpy as np
 
-def standardize(x):
+def standardize(x, ignore_first = True):
     """Standardize the original data set."""
     x = np.copy(x)
     mean_x = np.mean(x, axis=0)
     x = x - mean_x
+    if ignore_first:
+        x[:,0] = 1
     std_x = np.std(x, axis=0)
-    x = x / std_x
+    for i in range(std_x.shape[0]):
+        if std_x[i] > 0: x[:, i] = x[:, i] / std_x[i]
     return x, mean_x, std_x
 
 def binarize_categorical_feature(f):
@@ -137,7 +140,7 @@ def test_stand_1():
     x = [[1,2,3],[4,5,6]]
     x_copy = np.copy(x)
     x_ans = (np.array([[-1., -1., -1.], [ 1.,  1.,  1.]]), np.array([ 2.5,  3.5,  4.5]), np.array([ 1.5,  1.5,  1.5]))
-    x_st = standardize(x)
+    x_st = standardize(x, ignore_first = False)
     for a, b in zip(x_ans, x_st):
         assert np.allclose(a, b), "standardize"
     assert np.all(x_copy == x), "copy"
