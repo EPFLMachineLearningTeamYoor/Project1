@@ -7,7 +7,7 @@ def grad(y, tx, w):
 
 def loss(y, tx, w):
     """ returns logistic regression loss """
-    return np.sum(- np.multiply(tx @ w, y) + np.log(1 + np.exp(tx @ w)))
+    return np.sum(- np.multiply(tx @ w, y) + np.log1p(np.exp(tx @ w)))
 
 def reg_grad(y, tx, w, lambda_):
     """ returns regularized logistic regression gradient """
