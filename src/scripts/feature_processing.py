@@ -11,6 +11,7 @@ def standardize(x):
 def binarize_categorical_feature(f):
     """ return binary columns for each feature value """
     values = sorted(list(set(f[:,0])))
+    assert len(values) < 10, "too many categories"
     x = np.zeros((f.shape[0], 1))
     for v in values:
         x = np.hstack((x, f == v))
@@ -38,8 +39,8 @@ def impute_with_mean(X_, ids, missing_val = -999):
 
 def add_polynomial(X, ids, max_degrees = 2):
     """ add constant feature and degrees of features ids up to selected degree """
-    if type(max_degrees) == type(int):
-        max_degrees = np.ones((len(ids))) * max_degrees
+    if type(max_degrees) == int:
+        max_degrees = [max_degrees] * len(ids)
     X_orig = X
     X = np.copy(X)
     X = np.hstack((np.ones((X.shape[0], 1)), X))
@@ -89,6 +90,16 @@ def test_poly_1():
     assert np.allclose(X_ans, add_polynomial(X, [0,2], max_degrees = [3,2])), "add_polynomial"
     assert np.all(X_copy == X), "copy"
 
+def test_poly_2():
+    X = np.array([[0,1,2],[3,4,5],[0.5,0.6,0.7]])
+    X_copy = np.copy(X)
+
+    X_ans = np.array([[  1.   ,   0.   ,   1.   ,   2.   ,   0.   ,     4.   ],
+           [  1.   ,   3.   ,   4.   ,   5.   ,   9.   ,  25.   ],
+           [  1.   ,   0.5  ,   0.6  ,   0.7  ,   0.25 ,   0.49 ]])
+    assert np.allclose(X_ans, add_polynomial(X, [0,2], max_degrees = 2)), "add_polynomial"
+    assert np.all(X_copy == X), "copy"
+
 def test_missing_1():
     X = [[0,1,2],[3,-999,5],[0,3,-999]]
     X_copy = np.copy(X)
@@ -103,6 +114,7 @@ def test_all():
     test_binarize_2()
     test_impute_1()
     test_poly_1()
+    test_poly_2()
     test_missing_1()
     return 1
 
