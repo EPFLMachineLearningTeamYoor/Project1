@@ -14,3 +14,8 @@ def compute_loss(y, tx, w):
     e = y - tx @ w
 
     return 1. / (2 * N) * (e.T @ e)
+
+def compute_loss_reg(y, tx, w, lambda_):
+    """Calculate the loss."""
+
+    return compute_loss(y, tx, w) + lambda_ * w.T @ w

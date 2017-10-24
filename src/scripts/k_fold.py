@@ -30,7 +30,7 @@ def cross_validation(y, tx, k_indices, k, model, kw_model, loss, kw_loss, lambda
     y_te = y[idx_te]
   
     # training ridge regression
-    weights = model(y_tr, x_tr, lambda_, **kw_model)
+    weights, _ = model(y_tr, x_tr, lambda_, **kw_model)
 
     # computing losses
     loss_tr = loss(y_tr, x_tr, weights, lambda_, **kw_loss)
@@ -38,7 +38,7 @@ def cross_validation(y, tx, k_indices, k, model, kw_model, loss, kw_loss, lambda
     
     return loss_tr, loss_te
 
-def cross_validation_select(x, y, model, loss, kw_model = {}, kw_loss = {}, seed = 1, k_fold = 5, N = 30, do_plot = True):
+def cross_validation_select(x, y, model, loss, kw_model = {}, kw_loss = {}, seed = 1, k_fold = 5, N = 30, do_plot = True, do_tqdm = False):
     lambdas = np.logspace(-6, 0, N)
     
     # split data in k fold
@@ -49,7 +49,7 @@ def cross_validation_select(x, y, model, loss, kw_model = {}, kw_loss = {}, seed
     rmse = [rmse_tr, rmse_te]
     rmse_all = [[], []]
     
-    for lambda_ in lambdas: #tqdm(lambdas):
+    for lambda_ in tqdm(lambdas) if do_tqdm else lambdas:
         rmse_ = [[], []]
         for k in range(k_fold):
             [rmse_[i].append(x) for i, x in
