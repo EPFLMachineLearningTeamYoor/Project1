@@ -2,6 +2,7 @@ import numpy as np
 
 def standardize(x):
     """Standardize the original data set."""
+    x = np.copy(x)
     mean_x = np.mean(x)
     x = x - mean_x
     std_x = np.std(x)
@@ -109,6 +110,16 @@ def test_missing_1():
     assert np.allclose(X_ans, indicator_missing(X, [1,2], missing_val = -999.)), "indicator_missing"
     assert np.all(X_copy == X), "copy"
 
+def test_stand_1():
+    x = [[1,2],[0,4]]
+    x_copy = np.copy(x)
+    x_ans = (np.array([[-0.50709255,  0.16903085],
+       [-1.18321596,  1.52127766]]), 1.75, 1.479019945774904)
+    x_st = standardize(x)
+    assert np.allclose((x_ans[1], x_ans[2]), (x_st[1], x_st[2])), "stand mean std"
+    assert np.allclose(x_ans[0], x_st[0]), "stand array"
+    assert np.all(x_copy == x), "copy"
+
 def test_all():
     test_binarize_1()
     test_binarize_2()
@@ -116,6 +127,7 @@ def test_all():
     test_poly_1()
     test_poly_2()
     test_missing_1()
+    test_stand_1()
     return 1
 
 if __name__ == "__main__":
