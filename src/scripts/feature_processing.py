@@ -1,11 +1,12 @@
+from tqdm import tqdm
 import numpy as np
 
 def standardize(x):
     """Standardize the original data set."""
     x = np.copy(x)
-    mean_x = np.mean(x)
+    mean_x = np.mean(x, axis=0)
     x = x - mean_x
-    std_x = np.std(x)
+    std_x = np.std(x, axis=0)
     x = x / std_x
     return x, mean_x, std_x
 
@@ -57,6 +58,28 @@ def indicator_missing(X, ids, missing_val = -999.):
         f_miss = 1. * (X[:, idx:idx + 1] == missing_val)
         X = np.hstack((X, f_miss))
     return X
+
+### DATASET-SPECIFIC FUNCTIONS
+
+need_impute = [0, 5, 6, 12, 23, 24, 25, 26, 27, 28]
+categorical = [23] #+1
+need_poly = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29]
+
+def process_X(X):
+    res = None
+    with tqdm(total=5) as pbar:
+        X_1 = indicator_missing(X, need_impute)
+        pbar.update(1)
+        X_2 = impute_with_mean(X_1, need_impute)
+        pbar.update(1)
+        X_3 = add_polynomial(X_2, need_poly)
+        pbar.update(1)
+        X_4 = binarize_categorical(X_3, categorical)
+        pbar.update(1)
+        X_5, _, _ = standardize(X_4)
+        pbar.update(1)
+        res = X_5
+    return res
 
 ### TESTING SECTION
 
@@ -111,13 +134,12 @@ def test_missing_1():
     assert np.all(X_copy == X), "copy"
 
 def test_stand_1():
-    x = [[1,2],[0,4]]
+    x = [[1,2,3],[4,5,6]]
     x_copy = np.copy(x)
-    x_ans = (np.array([[-0.50709255,  0.16903085],
-       [-1.18321596,  1.52127766]]), 1.75, 1.479019945774904)
+    x_ans = (np.array([[-1., -1., -1.], [ 1.,  1.,  1.]]), np.array([ 2.5,  3.5,  4.5]), np.array([ 1.5,  1.5,  1.5]))
     x_st = standardize(x)
-    assert np.allclose((x_ans[1], x_ans[2]), (x_st[1], x_st[2])), "stand mean std"
-    assert np.allclose(x_ans[0], x_st[0]), "stand array"
+    for a, b in zip(x_ans, x_st):
+        assert np.allclose(a, b), "standardize"
     assert np.all(x_copy == x), "copy"
 
 def test_all():
