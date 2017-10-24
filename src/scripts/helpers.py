@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import numpy as np
 import csv
 
@@ -29,7 +30,8 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
     # Parameter
     w = initial_w
 
-    for n_iter in range(max_iters):
+    with tqdm(total = max_iters, unit = 'epoch') as pbar:
+      for n_iter in range(max_iters):
         # calculating loss and gradient
         loss = loss_f(y, tx, w, **kwargs)
         gradient = grad_f(y, tx, w, **kwargs)
@@ -43,6 +45,9 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
         # debug message print
         if debug:
             print("Gradient Descent(%d/%d): loss=%.2f grad_norm=%.2f w_norm=%.2f" % (n_iter, max_iters - 1, np.mean(loss), np.linalg.norm(gradient), np.linalg.norm(w)))
+
+        pbar.set_postfix(loss=round(np.mean(loss), 2), grad=round(np.linalg.norm(gradient), 2), w=round(np.linalg.norm(w), 2))
+        pbar.update(1)
 
     return losses, ws
 
