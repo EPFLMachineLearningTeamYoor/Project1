@@ -15,6 +15,9 @@ def compute_loss(y, tx, w):
 
     return 1. / (2 * N) * (e.T @ e)
 
+def compute_accuracy_loss(y, tx, w, lambda_ = None):
+    return -np.mean(np.equal((tx @ w) > 0, y > 0))
+
 def compute_loss_reg(y, tx, w, lambda_):
     """Calculate the loss."""
 
