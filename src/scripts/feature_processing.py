@@ -1,14 +1,16 @@
 from tqdm import tqdm
 import numpy as np
 
-def standardize(x, ignore_first = True):
+def standardize(x, std_x = None, mean_x = None, ignore_first = True):
     """Standardize the original data set."""
     x = np.copy(x)
-    mean_x = np.mean(x, axis=0)
+    if type(mean_x) == type(None):
+        mean_x = np.mean(x, axis=0)
     x = x - mean_x
     if ignore_first:
         x[:,0] = 1
-    std_x = np.std(x, axis=0)
+    if type(std_x) == type(None):
+        std_x = np.std(x, axis=0)
     for i in range(std_x.shape[0]):
         if std_x[i] > 0: x[:, i] = x[:, i] / std_x[i]
     return x, mean_x, std_x
@@ -68,8 +70,9 @@ need_impute = [0, 5, 6, 12, 23, 24, 25, 26, 27, 28]
 categorical = [23] #+1
 need_poly = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29]
 
-def process_X(X):
+def process_X(X, tpl = (None, None)):
     res = None
+    (x_mean, x_std) = tpl
     with tqdm(total=5) as pbar:
         X_1 = indicator_missing(X, need_impute)
         pbar.update(1)
@@ -79,10 +82,10 @@ def process_X(X):
         pbar.update(1)
         X_4 = binarize_categorical(X_3, categorical)
         pbar.update(1)
-        X_5, _, _ = standardize(X_4)
+        X_5, x_mean, x_std = standardize(X_4, mean_x = x_mean, std_x = x_std)
         pbar.update(1)
         res = X_5
-    return res
+    return res, (x_mean, x_std)
 
 ### TESTING SECTION
 
