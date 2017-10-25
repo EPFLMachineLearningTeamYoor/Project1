@@ -8,9 +8,9 @@
 
 \author[1]{Sergei Volodin}
 \author[1]{Baran Nama}
-\author[1]{Name here 3}
+\author[1]{Omar Mehio}
 \affil[1]{EPFL}
-\affil[ ]{\textit {\{sergei.volodin,baran.nama,email3\}@epfl.ch}}
+\affil[ ]{\textit {\{sergei.volodin,baran.nama,omar.mehio\}@epfl.ch}}
 
 \begin{document}
 
@@ -24,7 +24,13 @@ Model overview is given for each considered algorithm and the best model is chos
 \end{abstract}
 
 \section{Introduction}
-Claim: it is possible to use simple methods for this dataset
+The Higgs boson is a famous elementary particle which was first predicted in 1960s and then discovered in 2012 \cite{higgs}. Its famousness is due to two facts, first being the collosal amount of effort put into construction of the Large Hadron Collider and conducting the ATLAS experiment and the second being the fact that the Higgs boson is considered to be connected to the fact that particles have a mass.
+
+The ATLAS experiment consists of protons colliding at near-relative speed. After collision, the resulting particles sometimes contain the Higgs boson. Itself, it is not detectable by LHC. However, it is possible to detect the particles that it is decaying to.
+
+The data being studied comprises of 250 000 objects (train) each having 30 features. Each object represents a collision of a stream of protons. The data was not obtained during the ATLAS experiment, but rather from the simulation \cite{data}. Features represent properties of detected particles. It is required to determine if the particles represent the Higgs boson.
+
+The following paper claims that it is possible to use simple methods, such as Linear and Logistic Regressions to classify the data. In the following sections, the data is thoroughly studied and then the model is chosen based on reasoning and cross-validation.
 \begin{enumerate}
 	\item What is the data (Simulation from LHC, details from physics)
 	\item What are we trying to do? Get the best classification score
@@ -46,5 +52,10 @@ Shows that accuracy is good enough meaning that model selection was good
 State that we can improve the accuracy by using non-linear classifiers?
 \section{Summary}
 We have shown that it is possible to detect the Higgs boson using linear methods and feature augmentation.
+
+\begin{thebibliography}{99}
+\bibitem{higgs} https://en.wikipedia.org/wiki/Higgs\_boson
+\bibitem{data} REPLACE ME
+\end{thebibliography}
 
 \end{document}
