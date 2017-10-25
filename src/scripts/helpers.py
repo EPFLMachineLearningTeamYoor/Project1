@@ -28,7 +28,7 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
     ws, losses = [initial_w], []
 
     # Parameter
-    w = initial_w
+    w = np.copy(initial_w)
 
     with tqdm(total = max_iters, unit = 'epoch') as pbar:
       for n_iter in range(max_iters):

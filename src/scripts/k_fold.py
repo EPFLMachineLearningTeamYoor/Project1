@@ -39,7 +39,7 @@ def cross_validation(y, tx, k_indices, k, model, kw_model, loss, kw_loss, lambda
     return loss_tr, loss_te
 
 def cross_validation_select(x, y, model, loss, kw_model = {}, kw_loss = {}, seed = 1, k_fold = 5, N = 30, do_plot = True, do_tqdm = False):
-    lambdas = np.logspace(-6, 0, N)
+    lambdas = np.logspace(-6, 1, N)
     
     # split data in k fold
     k_indices = build_k_indices(len(y), k_fold, seed)
