@@ -58,6 +58,8 @@ def stochastic_gradient_descent(
     # Define parameters to store w and loss
     ws, losses = [initial_w], []
 
+    max_up_count = 10
+
     # Parameter
     w = np.copy(initial_w)
 
@@ -66,6 +68,8 @@ def stochastic_gradient_descent(
     g_n_b = []
 
     NORM_MAX = 1e7
+
+    w_old = np.copy(w)
 
     with tqdm(total = max_iters, unit = 'epoch') as pbar:
       for (n_iter, (overlap, y_, tx_)) in enumerate(batch_iter(y, tx, batch_size = batch_size, num_batches=max_iters, shuffle=True)):
@@ -87,9 +91,14 @@ def stochastic_gradient_descent(
         if debug:
             print("Stochastic Gradient Descent(%d/%d): loss=%.2f" % (n_iter, max_iters - 1, np.mean(loss)))
 
-        if overlap:
-            pbar.set_postfix(loss=round(np.mean(ls_n_b), 2), grad=round(np.mean(g_n_b), 2), w=round(np.mean(w_n_b), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2))#, sz=len(y_))
+        if overlap and len(g_n_b) > 0:
+            eps_w = np.linalg.norm(w - w_old) / np.mean(w_n_b) / gamma
+#            if eps_w < 1e-2:
+#                return losses[:-1], ws[:-1]
+            pbar.set_postfix(loss=round(np.mean(ls_n_b), 2), grad=round(np.mean(g_n_b), 2), w=round(np.mean(w_n_b), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2), diff=eps_w)
             ls_n_b, w_n_b, g_n_b = [], [], []
+            w_old = np.copy(w)
+
         pbar.update(1)
 
     return losses, ws
