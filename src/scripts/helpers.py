@@ -1,6 +1,7 @@
 from tqdm import tqdm
 import numpy as np
 import csv
+from scripts import model_linear
 
 def get_last_ans(ws, losses):
     """ return last w in array and last loss in array """
@@ -46,7 +47,7 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
         if debug:
             print("Gradient Descent(%d/%d): loss=%.2f grad_norm=%.2f w_norm=%.2f" % (n_iter, max_iters - 1, np.mean(loss), np.linalg.norm(gradient), np.linalg.norm(w)))
 
-        pbar.set_postfix(loss=round(np.mean(loss), 2), grad=round(np.linalg.norm(gradient), 2), w=round(np.linalg.norm(w), 2))
+        pbar.set_postfix(loss=round(np.mean(loss), 2), grad=round(np.linalg.norm(gradient), 2), w=round(np.linalg.norm(w), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2))
         pbar.update(1)
 
     return losses, ws
@@ -58,9 +59,16 @@ def stochastic_gradient_descent(
     ws, losses = [initial_w], []
 
     # Parameter
-    w = initial_w
+    w = np.copy(initial_w)
 
-    for (n_iter, (y_, tx_)) in enumerate(batch_iter(y, tx, batch_size = batch_size, num_batches=max_iters, shuffle=True)):
+    ls_n_b = []
+    w_n_b = []
+    g_n_b = []
+
+    NORM_MAX = 1e7
+
+    with tqdm(total = max_iters, unit = 'epoch') as pbar:
+      for (n_iter, (overlap, y_, tx_)) in enumerate(batch_iter(y, tx, batch_size = batch_size, num_batches=max_iters, shuffle=True)):
         # calculating loss and gradient
         loss = loss_f(y, tx, w, **kwargs)
         stoch_gradient = grad_f(y_, tx_, w, **kwargs)
@@ -68,12 +76,21 @@ def stochastic_gradient_descent(
         # updating w
         w -= gamma * stoch_gradient
 
+        if np.linalg.norm(w) > NORM_MAX:
+            w = w / np.linalg.norm(w) * NORM_MAX
+
         # adding w, loss
         [x.append(y) for x, y in zip((ws, losses), (w, loss))]
+        [x.append(np.linalg.norm(y)) for x, y in zip((ls_n_b, w_n_b, g_n_b), (loss, w, stoch_gradient))]
 
         # debug message print
         if debug:
             print("Stochastic Gradient Descent(%d/%d): loss=%.2f" % (n_iter, max_iters - 1, np.mean(loss)))
+
+        if overlap:
+            pbar.set_postfix(loss=round(np.mean(ls_n_b), 2), grad=round(np.mean(g_n_b), 2), w=round(np.mean(w_n_b), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2))#, sz=len(y_))
+            ls_n_b, w_n_b, g_n_b = [], [], []
+        pbar.update(1)
 
     return losses, ws
 
@@ -88,6 +105,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         <DO-SOMETHING>
     """
     data_size = len(y)
+    start_index = 0
 
     if shuffle:
         shuffle_indices = np.random.permutation(np.arange(data_size))
@@ -97,7 +115,10 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         shuffled_y = y
         shuffled_tx = tx
     for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
+        overlap = start_index > data_size
+        if overlap:
+            start_index = 0
+        end_index = min(start_index + batch_size, data_size)
         if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
+            yield overlap, shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
+        start_index += batch_size

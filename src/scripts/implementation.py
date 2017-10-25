@@ -45,6 +45,15 @@ def reg_logistic_regression_newton(y, tx, lambda_, initial_w, max_iters, gamma, 
     losses, ws = gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f = model_logistic.reg_loss, grad_f = model_logistic.newton_reg_grad, kwargs = {'lambda_': lambda_}, debug = debug)
     return get_last_ans(ws, losses)
 
+def reg_logistic_regression_batch(y, tx, lambda_, initial_w, batch_size, max_iters, gamma, debug = False):
+    """ implement regularized logistic regression via gradient descent """
+    losses, ws = stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, loss_f = model_logistic.reg_loss, grad_f = model_logistic.reg_grad, kwargs = {'lambda_': lambda_}, debug = debug)
+    return get_last_ans(ws, losses)
+
+def reg_logistic_regression_newton_batch(y, tx, lambda_, initial_w, batch_size, max_iters, gamma, debug = False):
+    """ implement regularized logistic regression via gradient descent """
+    losses, ws = stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, loss_f = model_logistic.reg_loss, grad_f = model_logistic.newton_reg_grad, kwargs = {'lambda_': lambda_}, debug = debug)
+    return get_last_ans(ws, losses)
 
 ### TESTING SECTION
 
@@ -87,6 +96,9 @@ def test_all(N = 1000, D = 2, seed = 42):
     check_model(X, w, y_01)
 
     (w, l) = reg_logistic_regression_newton(y_01, X, 1, w_initial, 100, 0.01, debug = False)
+    check_model(X, w, y_01)
+
+    (w, l) = reg_logistic_regression_newton_batch(y_01, X, 1, w_initial, 10, 100, 0.01, debug = False)
     check_model(X, w, y_01)
 
     return(1)
