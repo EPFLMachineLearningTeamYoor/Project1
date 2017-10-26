@@ -70,7 +70,7 @@ need_impute = [0, 5, 6, 12, 23, 24, 25, 26, 27, 28]
 categorical = [23] #+1
 need_poly = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26,27,28,29]
 
-def process_X(X, tpl = (None, None)):
+def process_X(X, degree, tpl = (None, None)):
     res = None
     (x_mean, x_std) = tpl
     with tqdm(total=5) as pbar:
@@ -78,7 +78,7 @@ def process_X(X, tpl = (None, None)):
         pbar.update(1)
         X_2 = impute_with_mean(X_1, need_impute)
         pbar.update(1)
-        X_3 = add_polynomial(X_2, need_poly)
+        X_3 = add_polynomial(X_2, need_poly, max_degrees = degree)
         pbar.update(1)
         X_4 = binarize_categorical(X_3, categorical)
         pbar.update(1)
