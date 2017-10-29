@@ -46,23 +46,23 @@ def cross_validation_select(x, y, model, loss, kw_model = {}, kw_loss = {}, seed
     k_indices = build_k_indices(len(y), k_fold, seed)
     
     # define lists to store the loss of training data and test data
-    rmse_tr, rmse_te = [], []
-    rmse = [rmse_tr, rmse_te]
-    rmse_all = [[], []]
+    loss_val_tr, loss_val_te = [], []
+    loss_val = [loss_val_tr, loss_val_te]
+    loss_val_all = [[], []]
     
     for lambda_ in tqdm(lambdas) if do_tqdm else lambdas:
-        rmse_ = [[], []]
+        loss_val_ = [[], []]
         for k in range(k_fold):
-            [rmse_[i].append(x) for i, x in
+            [loss_val_[i].append(x) for i, x in
              enumerate(cross_validation(y, x, k_indices, k, model, kw_model, loss, kw_loss, lambda_))]
-        [rmse[i].append(np.mean(x)) for (i, x) in enumerate(rmse_)]
-        [rmse_all[i].append(x) for (i, x) in enumerate(rmse_)]
+        [loss_val[i].append(np.mean(x)) for (i, x) in enumerate(loss_val_)]
+        [loss_val_all[i].append(x) for (i, x) in enumerate(loss_val_)]
     
-    rmse_all = np.array(rmse_all)
-    idx_min = np.argmin(rmse_te)
+    loss_val_all = np.array(loss_val_all)
+    idx_min = np.argmin(loss_val_te)
 
     if do_plot:
-        plots.cross_validation_visualization(lambdas, rmse_tr, rmse_te,
-                                     all_data = [rmse_all[0].T, rmse_all[1].T])
+        plots.cross_validation_visualization(lambdas, loss_val_tr, loss_val_te,
+                                     all_data = [loss_val_all[0].T, loss_val_all[1].T])
     
-    return idx_min, rmse_all, lambdas
+    return idx_min, loss_val_all, lambdas

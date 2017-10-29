@@ -15,7 +15,7 @@ def cross_validation_visualization(lambds, mse_tr, mse_te, all_data = None):
 #        plt.boxplot(all_data[0], positions = lambds, widths = widths, manage_xticks = False, showfliers = False)
 #        plt.boxplot(all_data[1], positions = lambds, widths = widths, manage_xticks = False, showfliers = False)
     plt.xlabel("lambda")
-    plt.ylabel("rmse")
+    plt.ylabel("loss")
     plt.title("cross validation")
     plt.legend(loc=2)
     plt.grid(True)
