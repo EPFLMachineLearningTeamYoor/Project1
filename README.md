@@ -10,6 +10,6 @@ Project 1 for the EPFL ML course: https://mlo.epfl.ch/page-146520.html
 This project requires Python3 and virtualenv
 ```
  $ virtualenv -p $(which python3) venv
- $  source venv activate
+ $ source venv/bin/activate
  $ pip install -r requirements.txt
 ```

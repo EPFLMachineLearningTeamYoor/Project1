@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from mpl_scatter_density import ScatterDensityArtist
 from tqdm import tqdm
 
 def savefig(name):
