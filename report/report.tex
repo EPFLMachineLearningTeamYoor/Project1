@@ -2,6 +2,7 @@
 
 \usepackage{hyperref}
 \usepackage{graphicx}	% For figure environment
+\usepackage{amssymb}
 \usepackage{authblk}
 \usepackage{color}
 \usepackage{graphicx}
@@ -32,106 +33,70 @@ The Higgs boson is a famous elementary particle which was first predicted in 196
 
 The ATLAS experiment consists of protons colliding at near-relative speed. After collision, the resulting particles sometimes contain the Higgs boson. Itself, it is not detectable by LHC. However, it is possible to detect the particles that it is decaying to.
 
-The data being studied comprises of 250 000 objects (train) each having 30 features. Each object represents a collision of a stream of protons. The data was not obtained during the ATLAS experiment, but rather from the simulation \cite{data}. Features represent properties of detected particles. It is required to determine if the particles represent the Higgs boson.
+The data being studied comprises of 250 000 objects (train) each having 30 features: $\{(x_i,y_i)\}_{i=1}^N$, $x_i\in\mathbb{R}^D$, $N=250 000,\,D=30$. Each object represents a collision of a stream of protons. The data was not obtained during the ATLAS experiment, but rather from the simulation \cite{data}. Features represent properties of detected particles. It is required to determine if the particles represent the Higgs boson. The dataset has two classes: signal/noise.
 
 The following paper claims that it is possible to use simple methods, such as Linear and Logistic Regressions to classify the data. In the following sections, the data is thoroughly studied and then the model is chosen based on reasoning and cross-validation.
-\begin{enumerate}
-	\item What is the data (Simulation from LHC, details from physics)
-	\item What are we trying to do? Get the best classification score
-	\item Overview of data, diagrams of features, feature selection, feature augmentation
-	\item Methods and their choice (Linear regression, logistic regression, ridge regression) because of simplicity
-\end{enumerate}
 \section{Models and Methods}
-\begin{enumerate}
-\item Least squares. Problem: missing data, overfit
-\item Mean imputation. Problem: overfit, meaninglessness for some features
-\item Feature binarization, add new feature 'feature missing', add squares for features for mass
-\item Ridge regression using k-fold. Problem: low accuracy (?)
-\item Logistic regression
-\item Nearest neighbors?
-\end{enumerate}
-\subsection{K-Fold Cross validation for hyper parameter}
-In the previous chapter, we tried to train a basic linear model to 
-estimate test label from input data. When we try to validate our model, 
-we simply use train data to measure how well our model estimates. 
-However, the problem is that our model is overfitting or under fitting 
-the train data so that train error might not seem to be a good 
-indication of how well the learner will generalize to an independent/ 
-unseen data set. At this point, we decided to use cross validation 
-technique to estimate our model performance for new data.\\ 
+\begin{table}[!htb]
+	\caption{Feature processing tricks and linear regression}	\label{tab:feature_proc}
+	\centering\begin{tabular}{|lc|}\hline
+		{\bf Feature trick added} & {\bf Test accuracy}\\\hline
+		Constant feature & 0.745\\
+		Standardization & 0.745\\
+		Imputation & 0.747\\
+		Binarization & 0.747\\
+		Degree 3 poly & 0.785\\\hline
+	\end{tabular}
+\end{table}
 
-The second problem in previous chapter is that model parameters are 
-simply unbounded, which can be resulted in overfitting to train data. 
-Therefore, we need to introduce ridge regression to regulate our model 
-parameters. However, we need to hyper parameter optimization for ridge 
-regression in order to predict best model parameters for linear 
-regression. Cross validation technique is suitable to select best hyper 
-parameter for ridge regression. The pseudocode algorithm for this 
-chapter is given below:
-
-\begin{itemize}
-\item Setup a lambda set for testing ridge regression hyper parameters
-\item Estimate model parameters using each lambda values in the lambda 
-set for ridge regression
-\item Apply k-fold cross validation for each model, calculate and store 
-train and test error
-\item After calculating train and test error for all possible lambda 
-values, choose the model parameters which has lowest test error
-\item Visualize train and test error for each lambda values to check 
-model correctness visually
-\end{itemize}
-In the first setup, we did not introduce any higher degree polynomial 
-basis other than input parameters. In this setup, the best lambda value: 
-10$^{-6}$, test error: 0.3378 and train error (for best test error): 
-0.3377 (k-fold: 5 for all test benches). The result plot is given below 
-(Figure -1):
-\begin{center}
-\begin{figure}[h]
-\includegraphics[scale=0.5]{linear_1}
-\centering
-\caption{MSE - Lambda plot for first degree linear model}
+\begin{figure}[!htb]
+	\centering \includegraphics[width=100px]{../src/analysis/xy_tr_imp}
+	\centering \includegraphics[width=100px]{../src/analysis/hist_te_imp}
+	\centering \includegraphics[width=100px]{../src/analysis/hist-scatter-tr-imp-0}
+	\centering \includegraphics[width=100px]{../src/analysis/correlation}
+	\caption{Exploratory data analysis using charts}
+	\label{fig:data}
 \end{figure}
-\end{center}
-\vspace{-15pt}
-After testing the first degree linear model, we decided to add several degree polynomial basis to decrease bias and increase accuracy. The result plot is given below (Figure -2,3,4 and 5):
-\begin{center}
-\begin{figure}
-\includegraphics[scale=0.4]{linear_2}
-\centering
-\caption{MSE - Lambda plot for second degree linear model}
-\textbf{\textcolor{red}{The best lambda value: 0.01, test error: 0.3483 and train error (for best test error): 0.3158}}
-\vspace{5ex}
 
-\includegraphics[scale=0.4]{linear_3}
-\centering
-\caption{MSE - Lambda plot for third degree linear model}
-\textbf{\textcolor{red}{The best lambda value: 0.0001, test error: 0.306 and train error (for best test error): 0.304}}
-\vspace{5ex}
+First, the exploratory data analysis shows that most of the features (except one) are real-valued \ref{fig:data}, 1-2. Moreover, it is also can be seen that the test distribution does not differ from the train one \ref{fig:data}, 1. Scatter plots \ref{fig:data}, 3 show dependencies between features, as well as the correlation plot \ref{fig:data}, 4.
 
-\includegraphics[scale=0.4]{linear_4}
-\centering
-\caption{MSE - Lambda plot for fourth degree linear model}
-\textbf{\textcolor{red}{The best lambda value: 0.0004, test error: 0.303 and train error (for best test error): 0.301}}
-\vspace{5ex}
+To begin with, a simple linear regression model is used on raw data (with a constant feature added), with 5-fold cross-validation to control overfitting. The results of each subsample are averaged to provide train/test accuracy. However, the model gives unsatisfying results on the hold-out dataset. As a means to deal with this issue, feature imputation and feature engineering is used: missing features are imputed with mean values (and `missing value` feature is added), categorical features are binarized. Moreover, it has been discovered that some of the features represent particle's mass, momentum or energy. Using the fact that squaring these quantities would make linear combinations of them meaningful in terms of physics ($E^2=m^2+p^2$), we introduce the polynomial basis. Table \ref{tab:feature_proc} shows the respective effects of these tricks.
 
-\includegraphics[scale=0.4]{linear_5}
-\centering
-\caption{MSE - Lambda plot for fifth degree linear model}
-\textbf{\textcolor{red}{The best lambda value: 0.0006, test error: 0.305 and train error (for best test error): 0.301}}
+\begin{figure}[!htb]
+	\centering \includegraphics[width=110px]{linear_5}
+	\centering \includegraphics[width=110px]{ridge_accuracy_deg6}
+	\caption{Degree 6 basis, MSE and Accuracy metrics}
+	\label{fig:deg6}
 \end{figure}
-\end{center}
-\newpage
-As can be seen in the figures and results, while train error is continuously decreasing because of over-fitting, there is no significant change in test error after third degree polynomial basis. Therefore, feature extraction using polynomial basis does not seem working for higher degrees. Furthermore, the accuracy of the model in Kaggle is not as good as what we expected (0.79 - 0.8), so that we decided to switch logistic regression, which will be discussed in the next chapter, to enhance accuracy.
+
+Applying ridge regression, it might be seen that it does not overfit in terms of accuracy (but does in terms of MSE \ref{fig:deg6}) on the dataset given even for the 6th degree, meaning that there is no significant difference between the test and the train accuracies. Applying it for different degrees, one obtains results shown in the Table \ref{tab:degrees}. It can be seen that 
+
+\section{Models and Methods}
+\begin{table}[!htb]
+	\caption{Polynomial basis and linear regression, $\lambda=0$}	\label{tab:degrees}
+	\centering\begin{tabular}{|lcccc|}\hline
+		{\bf Degree} & {\bf Test accuracy} & {\bf MSE Test} & {\bf MSE Train} & {$\lambda$ best}\\
+		1 & 0.7470 & 0.3378 & 0.3377 & $10^{-6}$\\
+		2 & 0.7737 & 0.3483 & 0.3158 & $10^{-2}$\\		
+		3 & 0.7850 & 0.3060 & 0.3040 & $10^{-4}$\\
+		4 & 0.7937 & 0.3030 & 0.3010 & 0.0004\\
+		5 & 0.7971 & 0.3050 & 0.3010 & 0.0006\\\hline
+	\end{tabular}
+\end{table}
+
+As can be seen in the figures and results, while train MSE is continuously decreasing because of over-fitting, there is no significant change in test error after third degree polynomial basis. Therefore, feature extraction using polynomial basis does not seem to work for higher degrees. Furthermore, the accuracy of the model in Kaggle is not as good as what we expected (below 0.8), so that we decided to switch logistic regression since it uses a loss function tailored for the purpose of classification.
+
+Applying logistic regression to the dataset, we have found out that it is crucial to implement the Newton's method since gradient update is taking too much time. Moreover, we discovered that the magnitude $\gamma$ of the gradient step depends on the size of the dataset. Therefore, we use batched version of stochastic gradient descent for logistic regression as the optimizer. Since the 
 \section{Results}
-Shows that accuracy is good enough meaning that model selection was good
+We have presented an application of linear, ridge and logistic regression to the dataset. The best model was logistic regression with best accuracy 0.81.
 \section{Discussion}
-State that we can improve the accuracy by using non-linear classifiers?
+Despite thorough analysis, our project lacks further consideration in the following directions. First, it can be seen that some of the features do not look alike the Gaussian distribution. It might prove beneficial to split such features into two using a certain threshold.
 \section{Summary}
 We have shown that it is possible to detect the Higgs boson using linear methods and feature augmentation.
-
 \begin{thebibliography}{99}
-\bibitem{higgs} https://en.wikipedia.org/wiki/Higgs\_boson
-\bibitem{data} REPLACE ME
+\bibitem{higgs} \href{https://en.wikipedia.org/wiki/Higgs\_boson}{en.wikipedia.org/wiki/Higgs\_boson}
+\bibitem{data} \href{http://higgsml.lal.in2p3.fr/files/2014/04/documentation\_v1.8.pdf}{Experiment and feature description}
+\bibitem{kaggle} \href{http://kaggle.com/c/epfml-higgs}{EPFL ML Project 1}
 \end{thebibliography}
 
 \end{document}
