@@ -9,8 +9,9 @@ Project 1 for the EPFL ML course: https://mlo.epfl.ch/page-146520.html
 * **src/run_tests.py** tests critical functions
 
 ## Installation
-This project requires Python3 and virtualenv
+This project requires Python3 and virtualenv. Tested on Ubuntu Server 16.04.3 LTS
 ```
+ $ sudo apt-get install python3-tk virtualenv python3
  $ ls README.md
 # File should be in place
  $ virtualenv -p $(which python3) venv
