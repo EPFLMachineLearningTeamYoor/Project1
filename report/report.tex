@@ -53,12 +53,14 @@ The following paper claims that it is possible to use simple methods, such as Li
 	\centering \includegraphics[width=100px]{../src/analysis/xy_tr_imp}
 	\centering \includegraphics[width=100px]{../src/analysis/hist_te_imp}
 	\centering \includegraphics[width=100px]{../src/analysis/hist-scatter-tr-imp-0}
-	\centering \includegraphics[width=100px]{../src/analysis/correlation}
+	\centering \includegraphics[width=110px]{../src/analysis/correlation}
 	\caption{Exploratory data analysis using charts}
 	\label{fig:data}
 \end{figure}
 
-First, the exploratory data analysis shows that most of the features (except one) are real-valued \ref{fig:data}, 1-2. Moreover, it is also can be seen that the test distribution does not differ from the train one \ref{fig:data}, 1. Scatter plots \ref{fig:data}, 3 show dependencies between features, as well as the correlation plot \ref{fig:data}, 4.
+First, the exploratory data analysis shows that most of the features (except one) are real-valued \ref{fig:data}, 1-2. Moreover, it can also be seen that the test distribution does not differ from the training one \ref{fig:data}, 1. Scatter plots \ref{fig:data}, 3 show dependencies between features.To further explore the linear dependencies among our features, we computed the correlation matrix,\ref{fig:data}, 4.
+Some of the significant dependencies we observed include the relationship among following tuples $(DER_prodeta_jet_jet ,DER_mass_jet_jet)$  and $( PRI_jet_subleading_phi,DER_sum_pt).$
+Each of these tuples have a -1 and +1 correlation coefficient respectively. This implies that for each column in the tuple we can eliminate the other pair since we are able to deduce the same amount of knowledge from either one of them. In practice this didn't turn out to be efficient as our prediction with deducted features resulted in lower accuracy. 
 
 To begin with, a simple linear regression model is used on raw data (with a constant feature added), with 5-fold cross-validation to control overfitting. The results of each subsample are averaged to provide train/test accuracy. However, the model gives unsatisfying results on the hold-out dataset. As a means to deal with this issue, feature imputation and feature engineering is used: missing features are imputed with mean values (and `missing value` feature is added), categorical features are binarized. Moreover, it has been discovered that some of the features represent particle's mass, momentum or energy. Using the fact that squaring these quantities would make linear combinations of them meaningful in terms of physics ($E^2=m^2+p^2$), we introduce the polynomial basis. Table \ref{tab:feature_proc} shows the respective effects of these tricks.
 
@@ -86,7 +88,9 @@ Applying ridge regression, it might be seen that it does not overfit in terms of
 
 As can be seen in the figures and results, while train MSE is continuously decreasing because of over-fitting, there is no significant change in test error after third degree polynomial basis. Therefore, feature extraction using polynomial basis does not seem to work for higher degrees. Furthermore, the accuracy of the model in Kaggle is not as good as what we expected (below 0.8), so that we decided to switch logistic regression since it uses a loss function tailored for the purpose of classification.
 
-Applying logistic regression to the dataset, we have found out that it is crucial to implement the Newton's method since gradient update rule is taking too much time since final iterations are going with a small step size. Moreover, we discovered that the magnitude $\gamma$ of the gradient step depends on the size of the dataset. Therefore, we use batched version of stochastic gradient descent for logistic regression as the optimizer to stabilize the size of the dataset the optimizer uses for training.
+
+Applying logistic regression to the dataset with gradient descent, we were obliged to choose a very small learning rate , since while computing the gradient (logistic function) , the exponential of the vecotr product of Xw would result in an overflow in the computation, due to their large values. Hence we chose $\gamma = 10^-5$ as our learning rate. Offcourse this came as a tradeoff with respect to the loss threshold we were aiming for. The larger the learning rate the faster we can approach to our global minimum. To solve this problem ,we took two descions. First we implemented the Newton's method to compute the gradient in a much faster time. The second approach was to find if there exists a relation between magnitude $\gamma$ of the gradient step and the size of the dataset.Our findings indicated that  magnitude $\gamma$ depends on the size of the dataset , hence we used batched version of stochastic gradient descent for logistic regression as the optimizer to stabilize the size of the dataset the optimizer uses for training.
+
 
 \section{Results}
 We have presented an application of linear, ridge and logistic regression to the dataset. The best model was logistic regression with best accuracy of 0.81.

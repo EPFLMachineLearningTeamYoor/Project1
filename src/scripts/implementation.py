@@ -41,7 +41,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, debug =
     return get_last_ans(ws, losses)
 
 def reg_logistic_regression_newton(y, tx, lambda_, initial_w, max_iters, gamma, debug = False):
-    """ implement regularized logistic regression via gradient descent """
+    """ implement regularized logistic regression via newtons method """
     losses, ws = gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f = model_logistic.reg_loss, grad_f = model_logistic.newton_reg_grad, kwargs = {'lambda_': lambda_}, debug = debug)
     return get_last_ans(ws, losses)
 
