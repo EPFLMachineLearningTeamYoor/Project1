@@ -33,5 +33,5 @@ This project requires Python3 and virtualenv. Tested on Ubuntu Server 16.04.3 LT
 4. Adding polynomial basis of degree 5
 4. Replacing categorical features with several binary ones
 5. Standardizing data (mean&std from train are used for test)
-6. Training Logistic Regression with lambda=1e-4 using Netwon's method gamma=1e-1, 80 iterations, fixed random seed
+6. Training Logistic Regression with lambda=2e-4 using Netwon's method gamma=1e-1, 80 iterations, fixed random seed
 7. Saving results to logreg_1_submission.csv

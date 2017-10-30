@@ -7,7 +7,7 @@ train_path = '../data/train.csv'
 test_path  = '../data/test.csv'
 output_path = 'logreg_1_submission.csv'
 deg = 5
-lambda_ = 1e-4
+lambda_ = 2e-4
 gamma = 0.1
 max_iters = [50, 20]
 
