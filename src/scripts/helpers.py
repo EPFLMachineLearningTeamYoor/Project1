@@ -51,8 +51,8 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
         if debug == True:
             print("Gradient Descent(%d/%d): loss=%.2f grad_norm=%.2f w_norm=%.2f" % (n_iter, max_iters - 1, np.mean(loss), np.linalg.norm(gradient), np.linalg.norm(w)))
 
-        acc_arr.append(model_linear.compute_accuracy_loss(y, tx,  w))
-        loss_arr.append(loss)
+        acc_arr.append(np.mean(model_linear.compute_accuracy_loss(y, tx,  w)))
+        loss_arr.append(np.mean(loss))
         pbar.set_postfix(loss=round(np.mean(loss), 2), grad=round(np.linalg.norm(gradient), 2), w=round(np.linalg.norm(w), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2))
         pbar.update(1)
 
