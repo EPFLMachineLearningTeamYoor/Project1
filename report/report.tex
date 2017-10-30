@@ -88,16 +88,28 @@ Applying ridge regression, it might be seen that it does not overfit in terms of
 
 As can be seen in the figures and results, while train MSE is continuously decreasing because of over-fitting, there is no significant change in test error after third degree polynomial basis. Therefore, feature extraction using polynomial basis does not seem to work for higher degrees. Furthermore, the accuracy of the model in Kaggle is not as good as what we expected (below 0.8), so that we decided to switch logistic regression since it uses a loss function tailored for the purpose of classification.
 
+Applying logistic regression with gradient descent to the dataset, we have found out that it is crucial to implement the Newton's method since gradient update rule is taking too much time since final iterations are going with a small step size since setting the step size of gradient descent to a larger value resulted in a numerical overflow. Moreover, we discovered that the magnitude $\gamma$ of the gradient step depends on the size of the dataset. Therefore, we use batched version of stochastic gradient descent for logistic regression as the optimizer to stabilize the size of the dataset the optimizer uses for training.
+However, applying this batched version to the dataset was costly due to the fact that working with a large matrix in numpy is faster than working with $k$ smaller matrices. Therefore, we used the standard Netwon algorithm and tuned the $\gamma$ manually for the final model.
 
-Applying logistic regression to the dataset with gradient descent, we were obliged to choose a very small learning rate , since while computing the gradient (logistic function) , the exponential of the vecotr product of Xw would result in an overflow in the computation, due to their large values. Hence we chose $\gamma = 10^-5$ as our learning rate. Offcourse this came as a tradeoff with respect to the loss threshold we were aiming for. The larger the learning rate the faster we can approach to our global minimum. To solve this problem ,we took two descions. First we implemented the Newton's method to compute the gradient in a much faster time. The second approach was to find if there exists a relation between magnitude $\gamma$ of the gradient step and the size of the dataset.Our findings indicated that  magnitude $\gamma$ depends on the size of the dataset , hence we used batched version of stochastic gradient descent for logistic regression as the optimizer to stabilize the size of the dataset the optimizer uses for training.
+The Figure \ref{fig:logreg}, 1 shows logistic regression accuracy for different regularization parameters $\lambda$. For this experiment, a constant number of iterations $20$ was chosen. The $\gamma$ parameter equals $\gamma=10^{-1}$. The chart indicates that the logistic regression does not overfit. Therefore, we have chosen the first in magnitude value of $\lambda=2\times 10^{-4}$ which allowed us to use $\gamma=0.1$ without overflows in loss. The figure \ref{fig:logreg}, 2 indicates the training schedule. Total number of $N=70$ iterations allowed us to bring the training error to 0. The solution has scored 0.82058 on Kaggle \cite{kaggle} (first part of test).
 
+Despite the fact that the gradient at the final point was close to $0$ compared to the previous values, the value of the loss did not equal to 0. Moreover, it can be seen that the train and test errors ware similar. These two facts indicate that linear model has a high bias and low variance when applied to this dataset.
+
+\begin{figure}[!htb]
+	\centering \includegraphics[width=150px]{logistic_lambda_cv_netwon_nobatch}
+	\centering \includegraphics[width=150px]{logistic_01}
+%	\centering \includegraphics[width=200px]{logistic_02}
+	
+	\caption{Degree 5 basis, Logistic regression accuracy}
+	\label{fig:logreg}
+\end{figure}
 
 \section{Results}
-We have presented an application of linear, ridge and logistic regression to the dataset. The best model was logistic regression with best accuracy of 0.81.
+We have presented an application of linear, ridge and logistic regression to the dataset. The best model was logistic regression with best accuracy of 0.82 trained with Newton's method. All of the linear models do not overfit on the dataset.
 \section{Discussion}
-Despite thorough analysis, our project lacks further consideration in the following directions. First, it can be seen that some of the features do not look alike the Gaussian distribution. It might prove beneficial to split such features into two using a certain threshold.
+Despite thorough analysis, our project lacks further consideration in the following directions. First, it can be seen that some of the features do not look alike the Gaussian distribution. It might prove beneficial to split such features into two using a certain threshold. Moreover, it might be useful to apply boosting or bagging techniques, as well as to use more sophisticated nonlinear classifiers, such as neural networks.
 \section{Summary}
-We have shown that it is possible to detect the Higgs boson using linear methods and feature augmentation.
+We have shown that it is possible to detect the Higgs boson using linear methods and feature augmentation. Such a simple solution gives fairly good performance and places the team below average on the Kaggle submission. However, this approach is not optimal in terms of model selection, since a linear model seem to not capture all of the specifics of data since it produces high bias.
 \begin{thebibliography}{99}
 \bibitem{higgs} \href{https://en.wikipedia.org/wiki/Higgs\_boson}{en.wikipedia.org/wiki/Higgs\_boson}
 \bibitem{data} \href{http://higgsml.lal.in2p3.fr/files/2014/04/documentation\_v1.8.pdf}{Experiment and feature description}

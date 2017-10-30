@@ -4,7 +4,7 @@ from scripts import plots
 from tqdm import tqdm
 
 def build_k_indices(num_row, k_fold, seed):
-    """build and seperate k random indices for k-fold."""
+    """ build and seperate k random indices for k-fold """
     interval = int(num_row / k_fold)
     np.random.seed(seed)
     indices = np.random.permutation(num_row)
@@ -13,7 +13,7 @@ def build_k_indices(num_row, k_fold, seed):
     return np.array(k_indices)
 
 def cross_validation(y, tx, k_indices, k, model, kw_model, loss, kw_loss, lambda_):
-    """return the loss of ridge regression."""
+    """ return the train and test losses for a given model """
 
     # indices for test.
     idx_te = k_indices[k]
@@ -39,6 +39,7 @@ def cross_validation(y, tx, k_indices, k, model, kw_model, loss, kw_loss, lambda
     return loss_tr, loss_te
 
 def cross_validation_select(x, y, model, loss, kw_model = {}, kw_loss = {}, seed = 1, k_fold = 5, do_plot = True, do_tqdm = False, lambdas = None):
+    """ run cross validation for a given model and loss using k folds """
     if type(lambdas) == type(None):
         lambdas = np.logspace(-6, 1, 10)
     

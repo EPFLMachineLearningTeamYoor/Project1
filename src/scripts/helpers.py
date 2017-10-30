@@ -2,6 +2,7 @@ from tqdm import tqdm
 import numpy as np
 import csv
 from scripts import model_linear
+from matplotlib import pyplot as plt
 
 def get_last_ans(ws, losses):
     """ return last w in array and last loss in array """
@@ -28,6 +29,9 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
     # Define parameters to store w and loss
     ws, losses = [initial_w], []
 
+    acc_arr = []
+    loss_arr = []
+
     # Parameter
     w = np.copy(initial_w)
 
@@ -44,11 +48,26 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_f, grad_f, kwargs 
         [x.append(y) for x, y in zip((ws, losses), (w, loss))]
 
         # debug message print
-        if debug:
+        if debug == True:
             print("Gradient Descent(%d/%d): loss=%.2f grad_norm=%.2f w_norm=%.2f" % (n_iter, max_iters - 1, np.mean(loss), np.linalg.norm(gradient), np.linalg.norm(w)))
 
+        acc_arr.append(np.mean(model_linear.compute_accuracy_loss(y, tx,  w)))
+        loss_arr.append(np.mean(loss))
         pbar.set_postfix(loss=round(np.mean(loss), 2), grad=round(np.linalg.norm(gradient), 2), w=round(np.linalg.norm(w), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2))
         pbar.update(1)
+
+    if debug == 'plot':
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_xlabel('Iteration')
+        ax.plot(range(len(loss_arr)), loss_arr, label='loss', c='green')
+        ax.set_ylabel('Loss')
+        ax2 = ax.twinx()
+        ax2.set_ylabel('Accuracy')
+        ax2.plot(range(len(acc_arr)), acc_arr, label='accuracy', c='red')
+        ax.legend(loc=2)
+        ax2.legend(loc=0)
+        plt.show()
 
     return losses, ws
 
@@ -66,6 +85,9 @@ def stochastic_gradient_descent(
     ls_n_b = []
     w_n_b = []
     g_n_b = []
+
+    acc_arr = []
+    loss_arr = []
 
     NORM_MAX = 1e7
 
@@ -88,7 +110,7 @@ def stochastic_gradient_descent(
         [x.append(np.linalg.norm(y)) for x, y in zip((ls_n_b, w_n_b, g_n_b), (loss, w, stoch_gradient))]
 
         # debug message print
-        if debug:
+        if debug == True:
             print("Stochastic Gradient Descent(%d/%d): loss=%.2f" % (n_iter, max_iters - 1, np.mean(loss)))
 
         if overlap and len(g_n_b) > 0:
@@ -96,10 +118,25 @@ def stochastic_gradient_descent(
 #            if eps_w < 1e-2:
 #                return losses[:-1], ws[:-1]
             pbar.set_postfix(loss=round(np.mean(ls_n_b), 2), grad=round(np.mean(g_n_b), 2), w=round(np.mean(w_n_b), 2), acc = round(model_linear.compute_accuracy_loss(y, tx,  w), 2), diff=eps_w)
+            acc_arr.append(model_linear.compute_accuracy_loss(y, tx,  w))
+            loss_arr.append(np.mean(ls_n_b))
             ls_n_b, w_n_b, g_n_b = [], [], []
             w_old = np.copy(w)
 
         pbar.update(1)
+
+    if debug == 'plot':
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_xlabel('Iteration')
+        ax.plot(range(len(loss_arr)), loss_arr, label='loss', c='green')
+        ax.set_ylabel('Loss')
+        ax2 = ax.twinx()
+        ax2.set_ylabel('Accuracy')
+        ax2.plot(range(len(acc_arr)), acc_arr, label='accuracy', c='red')
+        ax.legend(loc=2)
+        ax2.legend(loc=0)
+        plt.show()
 
     return losses, ws
 

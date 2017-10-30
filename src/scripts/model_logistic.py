@@ -14,11 +14,11 @@ def loss(y, tx, w):
 def reg_grad(y, tx, w, lambda_):
     """ returns regularized logistic regression gradient """
     (N, D) = tx.shape
-    return grad(y, tx, w) + (2 * lambda_ * w).reshape(D, 1)
+    return grad(y, tx, w) + (lambda_ * w).reshape(D, 1)
 
 def reg_loss(y, tx, w, lambda_):
     """ returns regularized logistic regression loss """
-    return loss(y, tx, w) + lambda_ * (w.T @ w)
+    return loss(y, tx, w) + 0.5 * lambda_ * (w.T @ w)
 
 def newton_grad(y, x, w, lambda_ = 0):
     """ returns newton gradient """
@@ -27,7 +27,7 @@ def newton_grad(y, x, w, lambda_ = 0):
     S = diags(np.multiply(sigma, 1 - sigma))
     H = x.T @ S @ x
     assert H.shape == (D, D), "H shape"
-    return np.linalg.pinv(H + np.eye(D) * 2 * lambda_) @ reg_grad(y, x, w, lambda_)
+    return np.linalg.pinv(H + np.eye(D) * lambda_) @ reg_grad(y, x, w, lambda_)
 
 def newton_reg_grad(y, x, w, lambda_):
     """ returns regularized newton gradient """
