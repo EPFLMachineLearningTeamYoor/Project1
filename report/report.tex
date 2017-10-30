@@ -88,6 +88,18 @@ As can be seen in the figures and results, while train MSE is continuously decre
 
 Applying logistic regression to the dataset, we have found out that it is crucial to implement the Newton's method since gradient update rule is taking too much time since final iterations are going with a small step size. Moreover, we discovered that the magnitude $\gamma$ of the gradient step depends on the size of the dataset. Therefore, we use batched version of stochastic gradient descent for logistic regression as the optimizer to stabilize the size of the dataset the optimizer uses for training.
 
+The Figure \ref{fig:logreg}, 1 shows logistic regression accuracy for different regularization parameters $\lambda$. For this experiment, a constant number of iterations $1000$ was chosen with batch size of $50 000$. The $\gamma$ parameter equals $\gamma=10^{-5}$. Using the chart, a value for $\lambda=5\times 10^{-5}$ was chosen.
+
+Starting Logistic regression training for the whole dataset using gradient descent ($\gamma=0.5$), one obtains convergence \ref{fig:logreg}, 2.
+
+\begin{figure}[!htb]
+	\centering \includegraphics[width=200px]{logistic_lambda}
+	\centering \includegraphics[width=200px]{logreg_42_gradient_gamma_1e-5}
+	
+	\caption{Degree 3 basis, Logistic regression accuracy}
+	\label{fig:logreg}
+\end{figure}
+
 \section{Results}
 We have presented an application of linear, ridge and logistic regression to the dataset. The best model was logistic regression with best accuracy of 0.81.
 \section{Discussion}
