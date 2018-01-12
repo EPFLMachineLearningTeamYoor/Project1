@@ -65,14 +65,16 @@ def indicator_missing(X, ids, missing_val = -999.):
     return X
 
 def add_mult(X):
-    n = X.shape[1]
-    res = np.hstack((np.copy(X), np.zeros((X.shape[0], n * (n - 1)))))
-    k = n
-    pbar = tqdm(total=n * (n - 1))
-    for i in range(n):
-        for j in range(i + 1, n):
-            res[:, k] = np.multiply(X[:, i], X[:, j])
-            k += 1
+    X = np.array(X)
+    num_features = X.shape[1]
+    num_to_add = num_features * (num_features - 1) // 2
+    res = np.hstack((np.copy(X), np.zeros((X.shape[0], num_to_add))))
+    idx_add = num_features
+    pbar = tqdm(total = num_to_add)
+    for i in range(num_features):
+        for j in range(i + 1, num_features):
+            res[:, idx_add] = np.multiply(X[:, i], X[:, j])
+            idx_add += 1
             pbar.update(1)
     return res
 
@@ -156,6 +158,14 @@ def test_missing_1():
 def test_stand_1():
     x = [[1,2,3],[4,5,6]]
     x_copy = np.copy(x)
+    x_ans = np.array([[  1.,   2.,   3.,   2.,   3.,   6.], [  4.,   5.,   6.,  20.,  24.,  30.]])
+    x_mul = add_mult(x)
+    assert np.allclose(x_mul, x_ans), "standardize"
+    assert np.all(x_copy == x), "copy"
+
+def test_mul_1():
+    x = [[1,2,3],[4,5,6]]
+    x_copy = np.copy(x)
     x_ans = (np.array([[-1., -1., -1.], [ 1.,  1.,  1.]]), np.array([ 2.5,  3.5,  4.5]), np.array([ 1.5,  1.5,  1.5]))
     x_st = standardize(x, ignore_first = False)
     for a, b in zip(x_ans, x_st):
@@ -170,6 +180,7 @@ def test_all():
     test_poly_2()
     test_missing_1()
     test_stand_1()
+    test_mul_1()
     return 1
 
 if __name__ == "__main__":
