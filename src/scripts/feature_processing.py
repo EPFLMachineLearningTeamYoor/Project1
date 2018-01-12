@@ -70,12 +70,10 @@ def add_mult(X):
     num_to_add = num_features * (num_features - 1) // 2
     res = np.hstack((np.copy(X), np.zeros((X.shape[0], num_to_add))))
     idx_add = num_features
-    pbar = tqdm(total = num_to_add)
     for i in range(num_features):
         for j in range(i + 1, num_features):
             res[:, idx_add] = np.multiply(X[:, i], X[:, j])
             idx_add += 1
-            pbar.update(1)
     return res
 
 ### DATASET-SPECIFIC FUNCTIONS
