@@ -64,6 +64,18 @@ def indicator_missing(X, ids, missing_val = -999.):
         X = np.hstack((X, f_miss))
     return X
 
+def add_mult(X):
+    n = X.shape[1]
+    res = np.hstack((np.copy(X), np.zeros((X.shape[0], n * (n - 1)))))
+    k = n
+    pbar = tqdm(total=n * (n - 1))
+    for i in range(n):
+        for j in range(i + 1, n):
+            res[:, k] = np.multiply(X[:, i], X[:, j])
+            k += 1
+            pbar.update(1)
+    return res
+
 ### DATASET-SPECIFIC FUNCTIONS
 
 need_impute = [0, 5, 6, 12, 23, 24, 25, 26, 27, 28]
@@ -73,12 +85,14 @@ need_poly = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26
 def process_X(X, degree, tpl = (None, None)):
     res = None
     (x_mean, x_std) = tpl
-    with tqdm(total=5) as pbar:
+    with tqdm(total=6) as pbar:
         X_1 = indicator_missing(X, need_impute)
         pbar.update(1)
         X_2 = impute_with_mean(X_1, need_impute)
         pbar.update(1)
-        X_3 = add_polynomial(X_2, need_poly, max_degrees = degree)
+        X_22 = add_mult(X_2)
+        pbar.update(1)
+        X_3 = add_polynomial(X_22, need_poly, max_degrees = degree)
         pbar.update(1)
         X_4 = binarize_categorical(X_3, categorical)
         pbar.update(1)
