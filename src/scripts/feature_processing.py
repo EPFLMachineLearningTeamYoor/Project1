@@ -85,20 +85,22 @@ need_poly = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26
 def process_X(X, degree, tpl = (None, None)):
     res = None
     (x_mean, x_std) = tpl
-    with tqdm(total=6) as pbar:
-        X_1 = indicator_missing(X, need_impute)
+    with tqdm(total=3) as pbar:
+        need_impute = list(range(X.shape[1]))
+#        X_1 = indicator_missing(X, need_impute)
+#        pbar.update(1)
+        X_2 = impute_with_mean(X, need_impute)
         pbar.update(1)
-        X_2 = impute_with_mean(X_1, need_impute)
-        pbar.update(1)
-        X_22 = add_mult(X_2)
-        pbar.update(1)
-        X_3 = add_polynomial(X_22, need_poly, max_degrees = degree)
-        pbar.update(1)
-        X_4 = binarize_categorical(X_3, categorical)
-        pbar.update(1)
-        X_5, x_mean, x_std = standardize(X_4, mean_x = x_mean, std_x = x_std)
-        pbar.update(1)
+#        X_22 = add_mult(X_2)
+#        pbar.update(1)
+#        X_3 = add_polynomial(X_22, need_poly, max_degrees = degree)
+#        pbar.update(1)
+#        res = binarize_categorical(X_2, categorical)
+#        pbar.update(1)
+        X_5, x_mean, x_std = standardize(X_2, mean_x = x_mean, std_x = x_std)
         res = X_5
+        pbar.update(1)
+#        res = X_5
     return res, (x_mean, x_std)
 
 ### TESTING SECTION
